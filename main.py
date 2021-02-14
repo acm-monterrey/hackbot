@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from discord.ext import commands
 import logging
+import random
 
 logging.basicConfig(level=logging.INFO)
 
@@ -10,8 +11,49 @@ load_dotenv()
 
 intents = discord.Intents.default()
 intents.members = True
+intents.reactions = True
+intents.messages = True
+intents.emojis = True
 
-bot = commands.Bot(command_prefix='-', intents=intents)
+
+class BotContext(commands.Context):
+    async def tick(self, value):
+        # reacts to the message with an emoji
+        # depending on whether value is True or False
+        # if its True, it'll add a green check mark
+        # otherwise, it'll add a red cross mark
+        emoji = '\N{WHITE HEAVY CHECK MARK}' if value else '\N{CROSS MARK}'
+        try:
+            # this will react to the command author's message
+            await self.message.add_reaction(emoji)
+        except discord.HTTPException:
+            # sometimes errors occur during this, for example
+            # maybe you dont have permission to do that
+            # we dont mind, so we can just ignore them
+            pass
+
+
+class MyBot(commands.Bot):
+    async def get_context(self, message, *, cls=BotContext):
+        # when you override this method, you pass your new Context
+        # subclass to the super() method, which tells the bot to
+        # use the new MyContext class
+        return await super().get_context(message, cls=cls)
+
+
+bot = MyBot(command_prefix='-', intents=intents)
+
+
+@bot.command()
+async def guess(ctx, number: int):
+    """ Guess a random number from 1 to 6. """
+    # explained in a previous example, this gives you
+    # a random number from 1-6
+    value = random.randint(1, 6)
+    # with your new helper function, you can add a
+    # green check mark if the guess was correct,
+    # or a red cross mark if it wasnt
+    await ctx.tick(number == value)
 
 
 @bot.event
@@ -19,23 +61,9 @@ async def on_ready():
     logging.info('We have logged in as {0.user}'.format(bot))
 
 
-'''
-@bot.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello ' + str(message.author) + "!")
-
-    if message.content.startswith('!assignteam' or '!at'):
-        pass
-'''
-
-
 @bot.command()
 async def ping(ctx):
-    '''Pong! Get the bot's response time'''
+    """Pong! Get the bot's response time"""
     em = discord.Embed(color=discord.Color.green())
     em.title = "Pong!"
     em.description = f'{bot.latency * 1000} ms'
@@ -122,6 +150,39 @@ async def mentor(ctx):
         await ctx.send('Wrong invocation of the mentor command, no sub-command passed!')
 
 
+@bot.command(pass_context=True)
+async def embed(ctx):
+    embed = discord.Embed(title="Sample Embed",
+                          description="👍 Request Mentor\n"
+                                      "👎🏻 Cancel Mentor Request\n"
+                                      "👀 See Available Mentors\n",
+                          color=0x8802F8)
+    embed.add_field(name='ID', inline=True, value='Alex')
+    sent = await ctx.send(embed=embed)
+    await sent.add_reaction(emoji="👍")
+    await sent.add_reaction(emoji="👎🏻")
+    await sent.add_reaction(emoji="👀")
+
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    # channel = reaction.message.channel
+    if payload.channel_id == '810303491792830495':
+        logging.info('reaction recieved')
+        print(payload)
+
+        if payload.name == '👍':
+            pass
+
+        if payload.name == "👎🏻":
+            pass
+
+        if payload.name == "👀":
+            pass
+
+        await payload.channel.send(f'{payload.member.name} has reacted to {payload.name}')
+
+
 @mentor.command(name='available')
 async def _available_mentors(ctx):
     """Shows all available mentors and their skills"""
@@ -144,6 +205,8 @@ async def _request_mentor(ctx, mentor_id):
 async def _request_mentor(ctx):
     """Request a mentor directly from the Discord Interface"""
     await ctx.send(f'Request for mentor was canceled by user {ctx.author.name}.')
+
+
 # Cancel request
 
 
@@ -177,6 +240,17 @@ async def _complete_mentoring(ctx):
     else:
         await ctx.send('No channel named, "mentoring-session", was found')
     # await ctx.send('Resources cleaned up!')
+
+
+"""
+ERROR HANDLING
+"""
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.errors.CheckFailure):
+        await ctx.send('You do not have the correct role for this command.')
 
 
 bot.run(os.getenv('TOKEN'))
