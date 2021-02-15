@@ -170,11 +170,11 @@ async def on_raw_reaction_add(payload, ):
 
     if channelID == payload.channel_id and payload.user_id != botID:
         if payload.emoji.name == '👍':
-            await
+            pass
         elif payload.emoji.name == '👎🏻':
             pass
         elif payload.emoji.name == '👀':
-            discord.utils.get()
+            pass
 
 
 @mentor.command(name='available')
