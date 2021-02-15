@@ -102,6 +102,7 @@ async def _assign_mentor(ctx):
 """USER MANAGEMENT"""
 
 
+@commands.has_role('Mesa')
 @bot.group()
 async def user(ctx):
     """Command for managing users and their permissions"""
@@ -118,6 +119,7 @@ async def _assign_team(ctx):
 """TEAM MANAGEMENT"""
 
 
+@commands.has_role('Mesa')
 @bot.group()
 async def team(ctx):
     """Command for managing teams"""
@@ -125,6 +127,7 @@ async def team(ctx):
         await ctx.send('Wrong invocation of the team command, no sub-command passed!')
 
 
+@commands.has_role('Mesa')
 @team.command(name='add')
 async def _add_team(ctx):
     """Add new team directly from the Discord Interface"""
@@ -134,6 +137,7 @@ async def _add_team(ctx):
     await ctx.send('Team is being added')
 
 
+@commands.has_role('Mesa')
 @team.command(name='remove')
 async def _remove_team(ctx):
     """Removes a team directly from the Discord Interface"""
@@ -183,7 +187,8 @@ async def on_raw_reaction_add(payload):
         await payload.channel.send(f'{payload.member.name} has reacted to {payload.name}')
 
 
-@mentor.command(name='available')
+@commands.has_role('Participante')
+@mentor.command(name='available', help='Shows all available mentors')
 async def _available_mentors(ctx):
     """Shows all available mentors and their skills"""
     pass
@@ -191,7 +196,7 @@ async def _available_mentors(ctx):
 
 
 @commands.has_role('Participante')
-@mentor.command(name='request')
+@mentor.command(name='request', help='Users request a mentor')
 async def _request_mentor(ctx, mentor_id):
     """Request a mentor directly from the Discord Interface"""
     # Notify Mentor of request via DM (include team number in msg)
@@ -201,7 +206,7 @@ async def _request_mentor(ctx, mentor_id):
 
 
 @commands.has_role('Participante')
-@mentor.command(name='cancel')
+@mentor.command(name='cancel', help='Cancel a mentorship request')
 async def _request_mentor(ctx):
     """Request a mentor directly from the Discord Interface"""
     await ctx.send(f'Request for mentor was canceled by user {ctx.author.name}.')
@@ -211,27 +216,41 @@ async def _request_mentor(ctx):
 
 
 @commands.has_role('mentor')
-@mentor.command(name='attend', pass_context=True)
+@mentor.command(name='attend', pass_context=True,
+                help='Marks mentor as available and creates an exclusive voice channel')
 async def _attend_team(ctx, team_to_attend):
     """Mentor accepts team request and moves to voice channel automatically"""
 
     # Channel is created exclusively for this session
     # Team receives a message with the channel and gets assigned permissions for such
 
+    # Assign role to mentor
+    member = ctx.message.author
+    role = bot.get(member.server.roles, name="Mentor-In-Progress")
+    await bot.add_roles(member, role)
+    logging.info('Added role to mentor for mentoring session')
     guild = ctx.message.guild
-    await guild.create_voice_channel('mentoring-session')
+    channel = await guild.create_voice_channel('mentoring-session')
+    await channel.set_permissions("Mentor-In-Progress")
+
     # Block channel from all participants
     # Assign mentor and team to channel (so they can see it)
     # Block mentor from being marked as available until session is closed
     await ctx.send(f'Mentor {ctx.author.name} will attend team {team_to_attend}.')
 
 
-@mentor.command(name='complete')
+@commands.has_role('mentor')
+@mentor.command(name='complete', pass_context=True, help='Marks a mentoring session as complete')
 async def _complete_mentoring(ctx):
     """Mentor marks mentoring session as completed, cleanup of used resources is done"""
     # check if the channel exists
     guild = ctx.message.guild
     existing_channel = discord.utils.get(guild.channels, name='mentoring-session')
+
+    # Remove role from mentor
+    member = ctx.message.author
+    role = bot.get(member.server.roles, name="Mentor-In-Progress")
+    await bot.remove_roles(member, role)
 
     # if the channel exists
     if existing_channel is not None:
@@ -243,12 +262,55 @@ async def _complete_mentoring(ctx):
 
 
 """
+HELPERS
+"""
+
+
+async def get_channel(channel_id):
+    channel = bot.get_channel(channel_id)
+
+    if not channel:
+        try:
+            channel = await bot.fetch_channel(channel_id)
+        except discord.InvalidData:
+            channel = None
+        except discord.HTTPException:
+            channel = None
+
+    return channel
+
+
+async def get_guild(guild_id):
+    guild = bot.get_guild(guild_id)
+
+    if not guild:
+        guild = await bot.fetch_guild(guild_id)
+
+    return guild
+
+
+async def getuser(id):
+    user = bot.get_user(id)
+
+    if not user:
+        user = await bot.fetch_user(id)
+
+    return user
+
+
+"""
 ERROR HANDLING
 """
 
 
 @bot.event
 async def on_command_error(ctx, error):
+    """
+    Handles permission errors
+    :param ctx:
+    :param error:
+    :return:
+    """
     if isinstance(error, commands.errors.CheckFailure):
         await ctx.send('You do not have the correct role for this command.')
 
