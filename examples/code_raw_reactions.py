@@ -5,6 +5,7 @@ import discord
 import json
 import datetime
 
+
 class TicketSystem(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -16,8 +17,11 @@ class TicketSystem(commands.Cog):
             with open(f"json/{json_file_name}", "r") as json_file:
                 json_dict = json.load(json_file)
         except:
-            embed_message = discord.Embed(title="Error: JSON", description="Please create a support ticket in the Nexus Developments Discord to get this resolved - https://discord.gg/YmdugDf",colour=discord.colour.Colour.red())
-            embed_message.set_footer(text="Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+            embed_message = discord.Embed(title="Error: JSON",
+                                          description="Please create a support ticket in the Nexus Developments Discord to get this resolved - https://discord.gg/YmdugDf",
+                                          colour=discord.colour.Colour.red())
+            embed_message.set_footer(text="Created By Nexus Developments - https://discord.gg/YmdugDf",
+                                     icon_url="https://i.imgur.com/MRBsIpe.png")
 
             await channel.send(embed=embed_message)
 
@@ -56,8 +60,11 @@ class TicketSystem(commands.Cog):
         guild_ticket_category = discord.utils.get(message.guild.categories, id=guild_ticket_category_id)
 
         if guild_ticket_category is None:
-            embed_message = discord.Embed(title="Error: TicketCategoryNotFound", description="Please create a support ticket in the Nexus Developments Discord to get this resolved - https://discord.gg/YmdugDf", colour=discord.colour.Colour.red())
-            embed_message.set_footer(text="Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+            embed_message = discord.Embed(title="Error: TicketCategoryNotFound",
+                                          description="Please create a support ticket in the Nexus Developments Discord to get this resolved - https://discord.gg/YmdugDf",
+                                          colour=discord.colour.Colour.red())
+            embed_message.set_footer(text="Created By Nexus Developments - https://discord.gg/YmdugDf",
+                                     icon_url="https://i.imgur.com/MRBsIpe.png")
 
             await message.channel.send(embed=embed_message)
         else:
@@ -71,8 +78,11 @@ class TicketSystem(commands.Cog):
         guild_support_role = discord.utils.get(message.guild.roles, id=guild_support_role_id)
 
         if guild_support_role is None:
-            embed_message = discord.Embed(title="Error: SupportRolesNotFound", description="Please create a support ticket in the Nexus Developments Discord to get this resloved - https://discord.gg/YmdugDf", colour=discord.colour.Colour.red())
-            embed_message.set_footer(text="Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+            embed_message = discord.Embed(title="Error: SupportRolesNotFound",
+                                          description="Please create a support ticket in the Nexus Developments Discord to get this resloved - https://discord.gg/YmdugDf",
+                                          colour=discord.colour.Colour.red())
+            embed_message.set_footer(text="Created By Nexus Developments - https://discord.gg/YmdugDf",
+                                     icon_url="https://i.imgur.com/MRBsIpe.png")
 
             await message.channel.send(embed=embed_message)
         else:
@@ -93,7 +103,8 @@ class TicketSystem(commands.Cog):
 
         with open(transcript_path, "w+") as ticket_transcript:
             for ticket_channel_message in ticket_channel_messages:
-                ticket_transcript.write(f"{ticket_channel_message.created_at} - {ticket_channel_message.author.name}#{ticket_channel_message.author.discriminator} - {ticket_channel_message.content}\n")
+                ticket_transcript.write(
+                    f"{ticket_channel_message.created_at} - {ticket_channel_message.author.name}#{ticket_channel_message.author.discriminator} - {ticket_channel_message.content}\n")
 
         return transcript_path
 
@@ -125,8 +136,11 @@ class TicketSystem(commands.Cog):
             await self.close_ticket(reaction.message.channel, user, reaction.message.guild, reaction.message.channel)
 
         if checked_create_ticket_reaction:
-            confirm_embed_message = discord.Embed(description="Please confirm your ticket creation with ✅ (for yes) and ❎ (for no)", color=discord.colour.Colour.green())
-            confirm_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+            confirm_embed_message = discord.Embed(
+                description="Please confirm your ticket creation with ✅ (for yes) and ❎ (for no)",
+                color=discord.colour.Colour.green())
+            confirm_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                                             icon_url="https://i.imgur.com/MRBsIpe.png")
 
             await create_ticket_msg.add_reaction("✅")
             await create_ticket_msg.add_reaction("❎")
@@ -137,7 +151,8 @@ class TicketSystem(commands.Cog):
                 return ticket_creation_user == user and str(ticket_creation_reaction.emoji) in {"✅", "❎"}
 
             try:
-                ticket_creation_reaction, ticket_creation_user = await self.bot.wait_for("reaction_add", timeout=60.0, check=ticket_creation_check)
+                ticket_creation_reaction, ticket_creation_user = await self.bot.wait_for("reaction_add", timeout=60.0,
+                                                                                         check=ticket_creation_check)
             except asyncio.TimeoutError:
                 for reaction in ["📩", "✅", "❎"]:
                     await create_ticket_msg.remove_reaction(reaction, user)
@@ -175,14 +190,18 @@ class TicketSystem(commands.Cog):
 
                     current_ticket_number += 1
 
-                    users_ticket_channel = await guild_ticket_category.create_text_channel(f"ticket-{current_ticket_number}", overwrites=ticket_channel_overwrites)
+                    users_ticket_channel = await guild_ticket_category.create_text_channel(
+                        f"ticket-{current_ticket_number}", overwrites=ticket_channel_overwrites)
 
                     await self.write_ticket_counter_to_json(create_ticket_msg, current_ticket_number)
 
                     await self.write_ticket_id_to_user_id(users_ticket_channel, user)
 
-                    ticket_embed_message = discord.Embed(description=f"Support will be with you shortly.\nTo close this ticket react with 🔒", color=discord.colour.Colour.green())
-                    ticket_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+                    ticket_embed_message = discord.Embed(
+                        description=f"Support will be with you shortly.\nTo close this ticket react with 🔒",
+                        color=discord.colour.Colour.green())
+                    ticket_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                                                    icon_url="https://i.imgur.com/MRBsIpe.png")
 
                     await users_ticket_channel.send(f"{user.mention} {guild_support_role.mention}")
                     users_ticket_channel_embed = await users_ticket_channel.send(embed=ticket_embed_message)
@@ -194,8 +213,11 @@ class TicketSystem(commands.Cog):
         if ticket_channel is None:
             ticket_channel = channel
 
-        confirm_closure_embed_message = discord.Embed(description=f"Please confirm the closure of {ticket_channel.mention}\n React with ✅ to close and ❎ to keep the ticket open", timestamp=datetime.datetime.now(), colour=discord.colour.Colour.red())
-        confirm_closure_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+        confirm_closure_embed_message = discord.Embed(
+            description=f"Please confirm the closure of {ticket_channel.mention}\n React with ✅ to close and ❎ to keep the ticket open",
+            timestamp=datetime.datetime.now(), colour=discord.colour.Colour.red())
+        confirm_closure_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                                                 icon_url="https://i.imgur.com/MRBsIpe.png")
 
         confirm_closure_message = await channel.send(embed=confirm_closure_embed_message)
         await confirm_closure_message.add_reaction("✅")
@@ -205,7 +227,8 @@ class TicketSystem(commands.Cog):
             return ticket_closure_user == author and str(ticket_closure_reaction.emoji) in {"✅", "❎"}
 
         try:
-            ticket_closure_reaction, ticket_closure_user = await self.bot.wait_for("reaction_add", timeout=60.0, check=ticket_creation_check)
+            ticket_closure_reaction, ticket_closure_user = await self.bot.wait_for("reaction_add", timeout=60.0,
+                                                                                   check=ticket_creation_check)
         except asyncio.TimeoutError:
             return
         else:
@@ -217,10 +240,15 @@ class TicketSystem(commands.Cog):
                 ticket_creator_user_id = ticket_creator_dict.get(str(ticket_channel.id))
                 ticket_creator_user = discord.utils.get(guild.members, id=ticket_creator_user_id)
 
-                await ticket_channel.set_permissions(ticket_creator_user, send_messages=False, add_reactions=True, read_messages=True)
+                await ticket_channel.set_permissions(ticket_creator_user, send_messages=False, add_reactions=True,
+                                                     read_messages=True)
 
-                transcript_status_embed_message = discord.Embed(description="Creating Transcript...", timestamp=datetime.datetime.now(), colour=discord.colour.Colour.orange())
-                transcript_status_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+                transcript_status_embed_message = discord.Embed(description="Creating Transcript...",
+                                                                timestamp=datetime.datetime.now(),
+                                                                colour=discord.colour.Colour.orange())
+                transcript_status_embed_message.set_footer(
+                    text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                    icon_url="https://i.imgur.com/MRBsIpe.png")
 
                 transcript_status_message = await channel.send(embed=transcript_status_embed_message)
 
@@ -228,8 +256,12 @@ class TicketSystem(commands.Cog):
 
                 transcript_dm_user = await self.bot.fetch_user(223200232232452096)
 
-                transcript_status_embed_message = discord.Embed(description=f"Created Transcript. Sending transcript to {transcript_dm_user.name}#{transcript_dm_user.discriminator}", timestamp=datetime.datetime.now(), colour=discord.colour.Colour.green())
-                transcript_status_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+                transcript_status_embed_message = discord.Embed(
+                    description=f"Created Transcript. Sending transcript to {transcript_dm_user.name}#{transcript_dm_user.discriminator}",
+                    timestamp=datetime.datetime.now(), colour=discord.colour.Colour.green())
+                transcript_status_embed_message.set_footer(
+                    text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                    icon_url="https://i.imgur.com/MRBsIpe.png")
 
                 await transcript_status_message.edit(embed=transcript_status_embed_message)
 
@@ -238,18 +270,30 @@ class TicketSystem(commands.Cog):
 
                 transcript_file = discord.File(transcript_path)
 
-                transcript_dm_embed_message = discord.Embed(title=f"Support Ticket Transcript: {ticket_channel.name}", timestamp=datetime.datetime.now(), colour=discord.colour.Colour.green())
-                transcript_dm_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+                transcript_dm_embed_message = discord.Embed(title=f"Support Ticket Transcript: {ticket_channel.name}",
+                                                            timestamp=datetime.datetime.now(),
+                                                            colour=discord.colour.Colour.green())
+                transcript_dm_embed_message.set_footer(
+                    text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                    icon_url="https://i.imgur.com/MRBsIpe.png")
 
                 await transcript_dm_user.dm_channel.send(embed=transcript_dm_embed_message, file=transcript_file)
 
-                ticket_closure_embed_message = discord.Embed(description=f"Ticket has been closed by {author.name}#{author.discriminator}", timestamp=datetime.datetime.now(), colour=discord.colour.Colour.green())
-                ticket_closure_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+                ticket_closure_embed_message = discord.Embed(
+                    description=f"Ticket has been closed by {author.name}#{author.discriminator}",
+                    timestamp=datetime.datetime.now(), colour=discord.colour.Colour.green())
+                ticket_closure_embed_message.set_footer(
+                    text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                    icon_url="https://i.imgur.com/MRBsIpe.png")
 
                 await ticket_channel.send(embed=ticket_closure_embed_message)
 
-                ticket_closure_option_embed_message = discord.Embed(description="Reopen Ticket: 🔓\nDelete Ticket: ⛔", timestamp=datetime.datetime.now(), colour=discord.colour.Colour.red())
-                ticket_closure_option_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+                ticket_closure_option_embed_message = discord.Embed(description="Reopen Ticket: 🔓\nDelete Ticket: ⛔",
+                                                                    timestamp=datetime.datetime.now(),
+                                                                    colour=discord.colour.Colour.red())
+                ticket_closure_option_embed_message.set_footer(
+                    text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                    icon_url="https://i.imgur.com/MRBsIpe.png")
 
                 ticket_closure_options_message = await ticket_channel.send(embed=ticket_closure_option_embed_message)
                 await ticket_closure_options_message.add_reaction("🔓")
@@ -259,7 +303,9 @@ class TicketSystem(commands.Cog):
                     return ticket_options_user != self.bot.user and str(ticket_options_reaction.emoji) in {"🔓", "⛔"}
 
                 try:
-                    ticket_options_reaction, ticket_options_user = await self.bot.wait_for("reaction_add", timeout=3600.0, check=ticket_options_check)
+                    ticket_options_reaction, ticket_options_user = await self.bot.wait_for("reaction_add",
+                                                                                           timeout=3600.0,
+                                                                                           check=ticket_options_check)
                 except asyncio.TimeoutError:
                     return
                 else:
@@ -267,10 +313,15 @@ class TicketSystem(commands.Cog):
                         await ticket_channel.delete()
 
                     if str(ticket_options_reaction.emoji) == "🔓":
-                        await ticket_channel.set_permissions(ticket_creator_user, send_messages=None, add_reactions=None, read_messages=True)
+                        await ticket_channel.set_permissions(ticket_creator_user, send_messages=None,
+                                                             add_reactions=None, read_messages=True)
 
-                        reopened_ticket_embed_message = discord.Embed(description=f"Ticket has been reopened by {ticket_options_user.name}#{ticket_options_user.discriminator}", timestamp=datetime.datetime.now(), colour=discord.colour.Colour.green())
-                        reopened_ticket_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+                        reopened_ticket_embed_message = discord.Embed(
+                            description=f"Ticket has been reopened by {ticket_options_user.name}#{ticket_options_user.discriminator}",
+                            timestamp=datetime.datetime.now(), colour=discord.colour.Colour.green())
+                        reopened_ticket_embed_message.set_footer(
+                            text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                            icon_url="https://i.imgur.com/MRBsIpe.png")
 
                         await ticket_channel.send(embed=reopened_ticket_embed_message)
 
@@ -279,8 +330,10 @@ class TicketSystem(commands.Cog):
         if channel is None:
             channel = ctx.message.channel
 
-        embedMessage = discord.Embed(title="Create A Ticket", description="To create a ticket react with 📩", timestamp=ctx.message.created_at, color=discord.colour.Colour.green())
-        embedMessage.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf", icon_url="https://i.imgur.com/MRBsIpe.png")
+        embedMessage = discord.Embed(title="Create A Ticket", description="To create a ticket react with 📩",
+                                     timestamp=ctx.message.created_at, color=discord.colour.Colour.green())
+        embedMessage.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
+                                icon_url="https://i.imgur.com/MRBsIpe.png")
 
         create_ticket_msg = await channel.send(embed=embedMessage)
         await create_ticket_msg.add_reaction("📩")
@@ -300,6 +353,7 @@ class TicketSystem(commands.Cog):
             channel = ctx.channel
 
         await self.close_ticket(ctx.channel, ctx.author, ctx.guild, channel)
+
 
 def setup(bot):
     bot.add_cog(TicketSystem(bot))
