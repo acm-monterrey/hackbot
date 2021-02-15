@@ -156,35 +156,29 @@ async def mentor(ctx):
 
 @bot.command(pass_context=True)
 async def embed(ctx):
-    embed = discord.Embed(title="Sample Embed",
+    embed = discord.Embed(title="Mentors Board",
                           description="👍 Request Mentor\n"
                                       "👎🏻 Cancel Mentor Request\n"
                                       "👀 See Available Mentors\n",
                           color=0x8802F8)
-    embed.add_field(name='ID', inline=True, value='Alex')
     sent = await ctx.send(embed=embed)
-    await sent.add_reaction(emoji="👍")
-    await sent.add_reaction(emoji="👎🏻")
-    await sent.add_reaction(emoji="👀")
+    await sent.add_reaction(emoji='👍')
+    await sent.add_reaction(emoji='👎🏻')
+    await sent.add_reaction(emoji='👀')
 
 
 @bot.event
-async def on_raw_reaction_add(payload):
-    # channel = reaction.message.channel
-    if payload.channel_id == '810303491792830495':
-        logging.info('reaction recieved')
-        print(payload)
+async def on_raw_reaction_add(payload, ):
+    channelID = 810379900418129950
+    botID = 810303721657073685
 
-        if payload.name == '👍':
+    if channelID == payload.channel_id and payload.user_id != botID:
+        if payload.emoji.name == '👍':
             pass
-
-        if payload.name == "👎🏻":
+        elif payload.emoji.name == '👎🏻':
             pass
-
-        if payload.name == "👀":
+        elif payload.emoji.name == '👀':
             pass
-
-        await payload.channel.send(f'{payload.member.name} has reacted to {payload.name}')
 
 
 @commands.has_role('Participante')
@@ -202,6 +196,7 @@ async def _request_mentor(ctx, mentor_id):
     # Notify Mentor of request via DM (include team number in msg)
     # Add request to queue
     # Notify team if mentor is currently busy or offline
+
     await ctx.send(f'Mentor {mentor_id} was requested by user {ctx.author.name}.')
 
 
@@ -316,3 +311,4 @@ async def on_command_error(ctx, error):
 
 
 bot.run(os.getenv('TOKEN'))
+
