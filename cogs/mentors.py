@@ -104,8 +104,7 @@ class MentorManagement(commands.Cog):
             confirm_embed_message = discord.Embed(
                 description="Please confirm your ticket creation with ✅ (for yes) and ❎ (for no)",
                 color=discord.colour.Colour.green())
-            confirm_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
-                                             icon_url="https://i.imgur.com/MRBsIpe.png")
+            confirm_embed_message.set_footer(text=f"HackMTY - HackBot")
 
             await create_ticket_msg.add_reaction("✅")
             await create_ticket_msg.add_reaction("❎")
@@ -165,8 +164,7 @@ class MentorManagement(commands.Cog):
                     ticket_embed_message = discord.Embed(
                         description=f"Support will be with you shortly.\nTo close this ticket react with 🔒",
                         color=discord.colour.Colour.green())
-                    ticket_embed_message.set_footer(text=f"Created By Nexus Developments - https://discord.gg/YmdugDf",
-                                                    icon_url="https://i.imgur.com/MRBsIpe.png")
+                    ticket_embed_message.set_footer(text=f"HackMTY - HackBot")
 
                     await users_ticket_channel.send(f"{user.mention} {guild_support_role.mention}")
                     users_ticket_channel_embed = await users_ticket_channel.send(embed=ticket_embed_message)
