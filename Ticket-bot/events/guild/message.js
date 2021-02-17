@@ -4,9 +4,11 @@ module.exports = (Discord, client, message) => {
         return;
     }
     const args = message.content.slice(prefix.length).split(/ +/);
-    const command = args.shift().toLowerCase();
+    const cmd = args.shift().toLowerCase();
 
-    if(command === 'embed'){
-        client.commands.get('embed').execute(message, args, Discord);
+    const command = client.commands.get(cmd);
+
+    if(command){
+        command.execute(client, message, args, Discord);
     }
 }
