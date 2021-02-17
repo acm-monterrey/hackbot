@@ -4,6 +4,13 @@ from dotenv import load_dotenv
 from discord.ext import commands
 import logging
 import random
+import sentry_sdk
+
+from cogs.mentors import setup
+
+sentry_sdk.init(os.getenv('SENTRY_SDK'),
+    traces_sample_rate=1.0
+)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -148,7 +155,7 @@ async def _remove_team(ctx):
 
 
 @bot.group()
-async def mentor(ctx):
+async def mentor1(ctx):
     """Command group for interacting with mentors"""
     if ctx.invoked_subcommand is None:
         await ctx.send('Wrong invocation of the mentor command, no sub-command passed!')
@@ -182,7 +189,7 @@ async def on_raw_reaction_add(payload, ):
 
 
 @commands.has_role('Participante')
-@mentor.command(name='available', help='Shows all available mentors')
+@mentor1.command(name='available', help='Shows all available mentors')
 async def _available_mentors(ctx):
     """Shows all available mentors and their skills"""
     pass
@@ -190,7 +197,7 @@ async def _available_mentors(ctx):
 
 
 @commands.has_role('Participante')
-@mentor.command(name='request', help='Users request a mentor')
+@mentor1.command(name='request', help='Users request a mentor')
 async def _request_mentor(ctx, mentor_id):
     """Request a mentor directly from the Discord Interface"""
     # Notify Mentor of request via DM (include team number in msg)
@@ -201,7 +208,7 @@ async def _request_mentor(ctx, mentor_id):
 
 
 @commands.has_role('Participante')
-@mentor.command(name='cancel', help='Cancel a mentorship request')
+@mentor1.command(name='cancel', help='Cancel a mentorship request')
 async def _request_mentor(ctx):
     """Request a mentor directly from the Discord Interface"""
     await ctx.send(f'Request for mentor was canceled by user {ctx.author.name}.')
@@ -211,7 +218,7 @@ async def _request_mentor(ctx):
 
 
 @commands.has_role('mentor')
-@mentor.command(name='attend', pass_context=True,
+@mentor1.command(name='attend', pass_context=True,
                 help='Marks mentor as available and creates an exclusive voice channel')
 async def _attend_team(ctx, team_to_attend):
     """Mentor accepts team request and moves to voice channel automatically"""
@@ -235,7 +242,7 @@ async def _attend_team(ctx, team_to_attend):
 
 
 @commands.has_role('mentor')
-@mentor.command(name='complete', pass_context=True, help='Marks a mentoring session as complete')
+@mentor1.command(name='complete', pass_context=True, help='Marks a mentoring session as complete')
 async def _complete_mentoring(ctx):
     """Mentor marks mentoring session as completed, cleanup of used resources is done"""
     # check if the channel exists
@@ -310,5 +317,6 @@ async def on_command_error(ctx, error):
         await ctx.send('You do not have the correct role for this command.')
 
 
+setup(bot)
 bot.run(os.getenv('TOKEN'))
 

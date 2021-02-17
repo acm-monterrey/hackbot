@@ -1,3 +1,5 @@
+pymongo
 discord
 discord.py
 python-dotenv
+sentry-sdk
