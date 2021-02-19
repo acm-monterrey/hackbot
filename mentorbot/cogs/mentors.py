@@ -1,12 +1,11 @@
 from discord.ext import commands
-from discord.ext import tasks
 import asyncio
 import discord
 import json
 import datetime
 import logging
 import re
-from config import connect_to_mongo
+from mentorbot.config import connect_to_mongo
 
 db = connect_to_mongo()
 db = db.hackbot

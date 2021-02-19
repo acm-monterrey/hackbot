@@ -6,11 +6,9 @@ import logging
 import random
 import sentry_sdk
 
-from cogs.mentors import setup
+from mentorbot.cogs.mentors import setup
 
-sentry_sdk.init(os.getenv('SENTRY_SDK'),
-    traces_sample_rate=1.0
-)
+sentry_sdk.init(os.getenv('SENTRY_SDK'), traces_sample_rate=1.0)
 
 logging.basicConfig(level=logging.INFO)
 

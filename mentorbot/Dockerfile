@@ -10,6 +10,6 @@ RUN \
  python3 -m pip install -r requirements.txt --no-cache-dir && \
  apk --purge del .build-deps
 
-COPY . .
+COPY .. .
 
 CMD [ "python", "main.py" ]
