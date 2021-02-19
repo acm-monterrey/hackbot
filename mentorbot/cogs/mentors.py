@@ -312,6 +312,9 @@ class MentorManagement(commands.Cog):
         with open("json/lock_mentoring_msg_id.json", "w") as lock_message_json_file:
             json.dump(lock_message_id_dict, lock_message_json_file)
 
+    async def save_lock_mentoring_id(self, message):
+        lock_message
+
 
 
 
