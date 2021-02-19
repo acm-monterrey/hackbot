@@ -5,6 +5,7 @@ import discord
 import json
 import datetime
 import logging
+import re
 from config import connect_to_mongo
 
 db = connect_to_mongo()
@@ -252,6 +253,12 @@ class MentorManagement(commands.Cog):
 
     # TODO INSPECT
     async def check_ticket_lock_reaction(self, reaction, user):
+        """
+        Checks if a mentoring session got a lock reaction, which triggers the closure of the session.
+        :param reaction: reaction object
+        :param user: user that generated that reaction
+        :return: returns the status of the reaction (true if triggered)
+        """
         lock_ticket_message_dict = await self.read_json_to_dict("lock_mentoring_msg_id.json", reaction.message.channel)
 
         if str(reaction.message.id) in lock_ticket_message_dict.keys():
@@ -296,36 +303,6 @@ class MentorManagement(commands.Cog):
             return guild_support_role
 """
 
-    # TODO INSPECT - made equivalent barebone
-    async def write_ticket_counter_to_json(self, message, current_ticket_number):
-        ticket_counter_dict = await self.read_json_to_dict("mentoring_counter.json", message.channel)
-
-        ticket_counter_dict[str(message.guild.id)] = current_ticket_number
-
-        with open("json/mentoring_counter.json", "w") as ticket_counter_json:
-            json.dump(ticket_counter_dict, ticket_counter_json)
-
-    # TODO INSPECT
-    async def create_ticket_transcript(self, ticket_channel: discord.TextChannel):
-        ticket_channel_messages = await ticket_channel.history(oldest_first=True).flatten()
-
-        transcript_path = f"transcripts/{datetime.date.today()}_{ticket_channel.name}_Transcript.txt"
-
-        with open(transcript_path, "w+") as ticket_transcript:
-            for ticket_channel_message in ticket_channel_messages:
-                ticket_transcript.write(
-                    f"{ticket_channel_message.created_at} - {ticket_channel_message.author.name}#{ticket_channel_message.author.discriminator} - {ticket_channel_message.content}\n")
-
-        return transcript_path
-
-    # TODO INSPECT - Made equivalente barebone
-    async def write_ticket_id_to_user_id(self, ticket_channel, user):
-        ticket_creator_dict = await self.read_json_to_dict("mentoring_creator_ids.json", ticket_channel)
-
-        ticket_creator_dict[str(ticket_channel.id)] = user.id
-
-        with open("json/mentoring_creator_ids.json", "w") as ticket_creator_json:
-            json.dump(ticket_creator_dict, ticket_creator_json)
 
     # TODO INSPECT
     async def write_lock_msg_id_to_json(self, message):
@@ -336,7 +313,12 @@ class MentorManagement(commands.Cog):
         with open("json/lock_mentoring_msg_id.json", "w") as lock_message_json_file:
             json.dump(lock_message_id_dict, lock_message_json_file)
 
-    async def save_mentoring_session_count_on_db(self, message):
+
+
+
+
+
+    async def get_mentoring_session_count_from_db(self, message):
         """
         Returns the number of mentoring sessions in the current guild.
         :param message: Message in question (contains guild number)
@@ -347,12 +329,27 @@ class MentorManagement(commands.Cog):
         return result["mentoring_sessions_count"]
 
     async def update_mentoring_session_count_on_db(self, message):
+        """
+        Updates the number of active mentoring sessions in the database
+        :param message: messange that contains the guild number (server number)
+        :return: None
+        """
         col = db.mentoring.count
         col.update_one({'_id': str(message.guild.id)}, {'$inc': {'mentoring_sessions_count': 1}})
 
 
-    async def link_mentoring_id_to_team_id_on_db(self, mentoring_id, team_id):
-        pass
+    async def link_mentoring_id_to_team_id_on_db(self, mentoring_id, user):
+        col = db.mentoring_team
+
+        for role in user.roles:
+            match = re.search(r'(?:Team)', role)
+            if match:
+                for split in role.split():
+                    if split.isdigit():
+                        team_number = split
+        to_insert = {mentoring_id: team_number}
+        col.insert_one(to_insert)
+
 
 
 def setup(bot):
