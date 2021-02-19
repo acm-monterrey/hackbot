@@ -5,6 +5,10 @@ import discord
 import json
 import datetime
 import logging
+from config import connect_to_mongo
+
+db = connect_to_mongo()
+db = db.hackbot
 
 
 class MentorManagement(commands.Cog):
@@ -25,7 +29,7 @@ class MentorManagement(commands.Cog):
             await ctx.send('Wrong invocation of the mentor command, no sub-command passed!')
 
     @mentor.command(name="request")
-    async def create_mentoring_session_request(self, ctx,
+    async def create_mentoring_session_request(self, ctx,  # member: discord.Member
                                                channel: discord.TextChannel = None):  # Set up channel for notifications here????
         if channel is None:
             channel = ctx.message.channel
@@ -38,28 +42,68 @@ class MentorManagement(commands.Cog):
         create_ticket_msg = await channel.send(embed=mentoring_request_embed)
         await create_ticket_msg.add_reaction("📩")
 
+        await ctx.message.delete()  # Deletes original request message (aka command used)
+
+        # Adds the mentoring request to the queue
+
+        # If emoji matches the request confirmation, give mentor channel permissions so that he can join it
+        # mark mentor as unavailable
+        # log the mentoring session
+        # watch for complete command, if confirmed, log the session and close it
+        # remove the permissions from the mentor
+        # mark mentor as available
+
+        # mentor_role_of_team_being_attended = discord.utils.get(ctx.guild.roles, name='Muted') # Team name goes instead of muted
+        # await member.add_roles(mentor_role_of_team_being_attended)
+        # await ctx.send("Mentor was assigned X team permissions")
+
+        # create_mentoring_msgs_dict = await self.read_json_to_dict("create_mentoring_msgs_ids.json", ctx.channel)
+
+        # create_mentoring_msgs_dict[str(create_ticket_msg.id)] = ctx.guild.id
+
+        # with open("json/create_mentoring_msgs_ids.json", "w") as create_ticket_msgs_json_file:
+        #    json.dump(create_mentoring_msgs_dict, create_ticket_msgs_json_file)
+
+    @commands.has_role('mentor')
+    @mentor.command(name="attend")
+    async def attend_team_that_needs_mentoring(self, ctx, team_to_attend):
+        # server_members = ctx.guild.members
+
+        # Need to check if that team is actually in the queue, and remove them from it afterwards
+        ctx.author.add_role('Team ' + team_to_attend)
+
+        ctx.send('You are able to join the teams voice channel!')
+        await asyncio.sleep(10)
         await ctx.message.delete()
 
-        # create_ticket_msgs_dict = await self.read_json_to_dict("create_ticket_msgs_ids.json", ctx.channel)
+    # TODO COMPLETE
+    @commands.has_role('mentor')
+    @mentor.command(name="queue")
+    async def show_team_mentoring_queue(self, ctx):
+        pass
 
-        # create_ticket_msgs_dict[str(create_ticket_msg.id)] = ctx.guild.id
+    # TODO COMPLETE
+    @commands.has_role('Participant')
+    @mentor.command(name="available")
+    async def show_available_mentors(self, ctx):
+        pass
 
-        # with open("json/create_ticket_msgs_ids.json", "w") as create_ticket_msgs_json_file:
-        #    json.dump(create_ticket_msgs_dict, create_ticket_msgs_json_file)
-
+    # TODO COMPLETE
+    @commands.has_role('mentor')
     @mentor.command(name="complete")
-    async def complete_mentoring_session(self, ctx, channel: discord.TextChannel = None):
+    async def complete_mentoring_session(self, ctx, team_attending, channel: discord.TextChannel = None):
         if channel is None:
             channel = ctx.channel
 
-        await self.close_mentoring_request(ctx.channel, ctx.author, ctx.guild, channel)
+        await self.close_mentoring_request(ctx, ctx.channel, ctx.author, ctx.guild, team_attending, channel)
 
-    async def close_mentoring_request(self, channel, author, guild, mentoring_channel: discord.TextChannel = None):
+    async def close_mentoring_request(self, ctx, channel, author, guild, team_attending,
+                                      mentoring_channel: discord.TextChannel = None):
         if mentoring_channel is None:
             mentoring_channel = channel
 
         confirm_closure_embed = discord.Embed(
-            description=f"Please confirm that mentoring session {mentoring_channel.mention} is done\n React with ✅ to close and ❎ to keep the session open",
+            description=f"Please confirm that mentoring session with team {mentoring_channel.mention} is done\n React with ✅ to close and ❎ to keep the session open",
             timestamp=datetime.datetime.now(), colour=discord.colour.Colour.red())
         confirm_closure_embed.set_footer(text=f"HackMTY - HackBot")
         confirm_closure_message = await channel.send(embed=confirm_closure_embed)
@@ -83,6 +127,12 @@ class MentorManagement(commands.Cog):
                 # Session closure was cancelled
                 return
             if str(mentoring_session_closure_reaction.emoji) == "✅":
+                ctx.author.remove_role('Team ' + team_attending)
+
+                ctx.send('You are able to join the teams voice channel!')
+                await asyncio.sleep(10)
+                await ctx.message.delete()
+
                 # TODO Unassign voice channel permissions for mentor
                 # TODO Delete Mentoring Channel (NVM)
                 # TODO Log Mentoring Session Metadata
@@ -91,7 +141,7 @@ class MentorManagement(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        create_ticket_msg = reaction.message
+        reacted_message = reaction.message
 
         checked_create_ticket_reaction = await self.check_create_ticket_reaction(reaction, user)
 
@@ -172,12 +222,137 @@ class MentorManagement(commands.Cog):
 
                     await self.write_lock_msg_id_to_json(users_ticket_channel_embed)
 
+    """
+    # TODO INSPECT
+    async def read_json_to_dict(self, json_file_name, channel):
+        json_dict = {}
+
+        try:
+            with open(f"json/{json_file_name}", "r") as json_file:
+                json_dict = json.load(json_file)
+        except:
+            embed_message = discord.Embed(title="Error: JSON",
+                                          description="Please create a support ticket",
+                                          colour=discord.colour.Colour.red())
+
+            await channel.send(embed=embed_message)
+
+        return json_dict
+    """
+
+    # TODO INSPECT
+    async def check_create_ticket_reaction(self, reaction, user):
+        create_ticket_msgs_dict = await self.read_json_to_dict("create_mentoring_msgs_ids.json",
+                                                               reaction.message.channel)
+
+        if str(reaction.message.id) in create_ticket_msgs_dict.keys():
+            if str(reaction.emoji) == "📩":
+                if user != self.bot.user:
+                    return True
+
+    # TODO INSPECT
+    async def check_ticket_lock_reaction(self, reaction, user):
+        lock_ticket_message_dict = await self.read_json_to_dict("lock_mentoring_msg_id.json", reaction.message.channel)
+
+        if str(reaction.message.id) in lock_ticket_message_dict.keys():
+            if user != self.bot.user:
+                return True
 
 
 
+    # TODO INSPECT
+    """
+    async def get_guild_ticket_catergory(self, message):
+        ticket_categories_dict = await self.read_json_to_dict("mentoring_categories_ids.json", message.channel)
+
+        guild_ticket_category_id = ticket_categories_dict.get(str(message.guild.id))
+
+        guild_ticket_category = discord.utils.get(message.guild.categories, id=guild_ticket_category_id)
+
+        if guild_ticket_category is None:
+            embed_message = discord.Embed(title="Error: TicketCategoryNotFound",
+                                          description="Please create a support ticket",
+                                          colour=discord.colour.Colour.red())
+
+            await message.channel.send(embed=embed_message)
+        else:
+            return guild_ticket_category
+
+    # TODO INSPECT
+    async def get_guild_support_roles(self, message):
+        support_roles_dict = await self.read_json_to_dict("support_roles_ids.json", message.channel)
+
+        guild_support_role_id = support_roles_dict.get(str(message.guild.id))
+
+        guild_support_role = discord.utils.get(message.guild.roles, id=guild_support_role_id)
+
+        if guild_support_role is None:
+            embed_message = discord.Embed(title="Error: SupportRolesNotFound",
+                                          description="Please create a support ticket",
+                                          colour=discord.colour.Colour.red())
+
+            await message.channel.send(embed=embed_message)
+        else:
+            return guild_support_role
+"""
+
+    # TODO INSPECT - made equivalent barebone
+    async def write_ticket_counter_to_json(self, message, current_ticket_number):
+        ticket_counter_dict = await self.read_json_to_dict("mentoring_counter.json", message.channel)
+
+        ticket_counter_dict[str(message.guild.id)] = current_ticket_number
+
+        with open("json/mentoring_counter.json", "w") as ticket_counter_json:
+            json.dump(ticket_counter_dict, ticket_counter_json)
+
+    # TODO INSPECT
+    async def create_ticket_transcript(self, ticket_channel: discord.TextChannel):
+        ticket_channel_messages = await ticket_channel.history(oldest_first=True).flatten()
+
+        transcript_path = f"transcripts/{datetime.date.today()}_{ticket_channel.name}_Transcript.txt"
+
+        with open(transcript_path, "w+") as ticket_transcript:
+            for ticket_channel_message in ticket_channel_messages:
+                ticket_transcript.write(
+                    f"{ticket_channel_message.created_at} - {ticket_channel_message.author.name}#{ticket_channel_message.author.discriminator} - {ticket_channel_message.content}\n")
+
+        return transcript_path
+
+    # TODO INSPECT - Made equivalente barebone
+    async def write_ticket_id_to_user_id(self, ticket_channel, user):
+        ticket_creator_dict = await self.read_json_to_dict("mentoring_creator_ids.json", ticket_channel)
+
+        ticket_creator_dict[str(ticket_channel.id)] = user.id
+
+        with open("json/mentoring_creator_ids.json", "w") as ticket_creator_json:
+            json.dump(ticket_creator_dict, ticket_creator_json)
+
+    # TODO INSPECT
+    async def write_lock_msg_id_to_json(self, message):
+        lock_message_id_dict = await self.read_json_to_dict("lock_mentoring_msg_id.json", message.channel)
+
+        lock_message_id_dict[str(message.id)] = message.channel.id
+
+        with open("json/lock_mentoring_msg_id.json", "w") as lock_message_json_file:
+            json.dump(lock_message_id_dict, lock_message_json_file)
+
+    async def save_mentoring_session_count_on_db(self, message):
+        """
+        Returns the number of mentoring sessions in the current guild.
+        :param message: Message in question (contains guild number)
+        :return: number of current and past mentoring sessions
+        """
+        col = db.mentoring_count
+        result = col.find_one({'_id': str(message.guild.id)})
+        return result["mentoring_sessions_count"]
+
+    async def update_mentoring_session_count_on_db(self, message):
+        col = db.mentoring.count
+        col.update_one({'_id': str(message.guild.id)}, {'$inc': {'mentoring_sessions_count': 1}})
 
 
-
+    async def link_mentoring_id_to_team_id_on_db(self, mentoring_id, team_id):
+        pass
 
 
 def setup(bot):
