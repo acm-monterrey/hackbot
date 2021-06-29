@@ -2,3 +2,4 @@
 .idea/
 venv/
 node_modules/
+Ticket-bot/config.json
