@@ -1,6 +1,6 @@
 const guildModel = require('../models/guild')
 const createTicket = require('../functions/createTicket')
-const addMentor = require('../functions/addMentor')
+//const addMentor = require('../functions/addMentor')
 const ticketModel = require('../models/ticket')
 const mentorModel = require('../models/mentor')
 
@@ -46,17 +46,17 @@ module.exports = async(client, reaction, user) => {
 
     } else if (reaction.message.channel.id === '849143330377302046') { // id del canal de administracion de mentoreo
         if(reaction.emoji.name === '✒️') {
-            const mentorDoc = await mentorModel.findOne({ userID: user.id})
+            const mentorDoc = await mentorModel.findOne({ username: `${user.username.toLowerCase() + '#' + user.discriminator}`})
 
             if(mentorDoc){
                 user.send('Este mentor ya existe.')
             } else {
-                addMentor(reaction.message, guild, user, mentorModel)
+                //addMentor(reaction.message, guild, user, mentorModel)
             }
         }
-    } else if (reaction.message.channel.id === '810379900418129950') { // id del canal de administracion de mentoreo
-        if(reaction.emoji.name === '🎫') {
-
+    } else if (reaction.message.channel.id === '860747174529990676') { // id del canal de check-in
+        if(reaction.emoji.name === '✅') {
+            // FALTA
         }
     }
 
