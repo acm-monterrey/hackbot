@@ -1,9 +1,9 @@
 const { Client, Message, MessageEmbed } = require("discord.js");
-const mentorModel = require('../models/mentor')
+const mentorModel = require('../../models/mentor')
 
 module.exports = {
     name: 'addmentor',
-    description: 'this is a add mentor command!',
+    description: 'Añadir un mentor a la lista de mentores.',
     aliases: ['am','addm'],
     async execute (client, message, cmd, args, Discord) {
         message.author.send("**REGISTRO MENTORES**\n **Introduce los datos a continuacion para completar el registro.**")

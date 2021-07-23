@@ -1,15 +1,17 @@
 const { MessageEmbed } = require("discord.js");
 const { readdirSync } = require("fs");
-const prefix = require("../index.js").prefix;
-
-console.log(prefix)
+const { idRolMentor, idRolStaff, idRolMesa2021 } = require("../..");
 
 module.exports = {
   name: "help",
   aliases : ['h'],
   description: "Shows all available bot commands.",
+  example: "?help",
   async execute (client, message, cmd, args, Discord) {
 
+    let mentorRole = message.member.roles.cache.find(r => r.id === idRolMentor);
+    let staffRole = message.member.roles.cache.find(r => r.id === idRolStaff);
+    let adminRole = message.member.roles.cache.find(r => r.id === idRolMesa2021);
 
     const roleColor =
       message.guild.me.displayHexColor === "#000000"
@@ -18,18 +20,24 @@ module.exports = {
 
     if (!args[0]) {
       let categories = [];
+      const mentorCategories = ["mentor"];
+      const adminCategories = ["admin"];
 
-      readdirSync("./commands/").forEach((dir) => {
-        const commands = readdirSync(`./commands/`).filter((file) =>
+      readdirSync("./commands/").forEach((direct) => {
+        if(mentorCategories.includes(direct) && !mentorRole) return;
+        if(adminCategories.includes(direct) && (!adminRole && !staffRole)) return;
+        const commands = readdirSync(`./commands/${direct}/`).filter((file) =>
           file.endsWith(".js")
         );
 
-        const cmds = commands.map((command) => {
-          let file = require(`../commands/${command}`);
 
-          if (!file.name) return "No hay nombre de comando.";
+        const cmds = commands.map((command) => {
+          let file = require(`../../commands/${direct}/${command}`);
+
+          if (!file.name) return "No existe el comando.";
 
           let name = file.name.replace(".js", "");
+
 
           return `\`${name}\``;
         });
@@ -37,7 +45,7 @@ module.exports = {
         let data = new Object();
 
         data = {
-          name: dir.toUpperCase(),
+          name: direct.toUpperCase(),
           value: cmds.length === 0 ? "En progreso..." : cmds.join(" "),
         };
 
@@ -46,7 +54,7 @@ module.exports = {
 
       const embed = new MessageEmbed()
         .setAuthor(client.user.username, client.user.displayAvatarURL({ dynamic: true }))
-        .setTitle('Lista de comandos de HackMTY :hackmty:')
+        .setTitle('Lista de comandos de HackMTY '/* + '<:hackmty:862511447682973756>'*/)
         .setThumbnail(client.user.avatarURL({ dynamic:true }))
         .addFields(categories)
         .setDescription(
@@ -91,6 +99,12 @@ module.exports = {
           command.description
             ? command.description
             : "No existe descripcion de este comando."
+        )
+        .addField(
+          "EJEMPLO:",
+          command.example
+            ? command.example
+            : "No existe ejemplo de este comando."
         )
         .setFooter(
           `Solicitado por ${message.author.tag}`,

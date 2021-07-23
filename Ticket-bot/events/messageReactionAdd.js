@@ -2,7 +2,9 @@ const guildModel = require('../models/guild')
 const createTicket = require('../functions/createTicket')
 //const addMentor = require('../functions/addMentor')
 const ticketModel = require('../models/ticket')
-const mentorModel = require('../models/mentor')
+const checkModel = require('../models/checkIn')
+const roleAssign = require('../functions/roleAssign')
+const { idCanalSoporte, idCanalCheckIn } = require('..')
 
 
 module.exports = async(client, reaction, user) => {
@@ -24,7 +26,7 @@ module.exports = async(client, reaction, user) => {
     }
 
 
-    if(reaction.message.channel.id === '840626647362699284') { // ID del canal ticket en el que se reaccionara.
+    if(reaction.message.channel.id === idCanalSoporte) { // ID del canal ticket en el que se reaccionara.
         
         if(reaction.emoji.name === '🎫') {
             const ticketDoc = await ticketModel.findOne({ guildID: guild.id, userID: user.id })
@@ -44,19 +46,9 @@ module.exports = async(client, reaction, user) => {
             }
         }
 
-    } else if (reaction.message.channel.id === '849143330377302046') { // id del canal de administracion de mentoreo
-        if(reaction.emoji.name === '✒️') {
-            const mentorDoc = await mentorModel.findOne({ username: `${user.username.toLowerCase() + '#' + user.discriminator}`})
-
-            if(mentorDoc){
-                user.send('Este mentor ya existe.')
-            } else {
-                //addMentor(reaction.message, guild, user, mentorModel)
-            }
-        }
-    } else if (reaction.message.channel.id === '860747174529990676') { // id del canal de check-in
+    } else if (reaction.message.channel.id === idCanalCheckIn) { // id del canal de check-in
         if(reaction.emoji.name === '✅') {
-            // FALTA
+            roleAssign(reaction, user, checkModel, client)
         }
     }
 

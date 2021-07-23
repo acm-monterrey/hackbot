@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const fetchall = require('discord-fetch-all')
 const fs = require('fs')
 const { MessageAttachment, Message } = require('discord.js')
+const { idCategoriaSoporte } = require('../index')
 
 module.exports = async (guild, user, guildDoc, ticketModel) => {
     guildDoc.ticketCount += 1;
@@ -31,7 +32,7 @@ module.exports = async (guild, user, guildDoc, ticketModel) => {
 
     const ticketChannel = await guild.channels.create(`ticket-${user.username.toLowerCase() + user.discriminator}`, {
         type: 'text',
-        parent: '811503336766832650',
+        parent: idCategoriaSoporte,
         permissionOverwrites: [
             {
                 allow: ['VIEW_CHANNEL', 'SEND_MESSAGES'],

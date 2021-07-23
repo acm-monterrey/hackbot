@@ -1,20 +1,22 @@
 const { Client, Message, MessageEmbed } = require("discord.js");
 const fetchall = require('discord-fetch-all')
-const mentorModel = require('../models/mentor')
+const mentorModel = require('../../models/mentor')
 const fs = require('fs')
-const { MessageAttachment } = require('discord.js')
+const { MessageAttachment } = require('discord.js');
+const { idRolMentor, idCategoriaMentoria } = require("../..");
 
 module.exports = {
     name: 'ping',
-    description: 'This command let users ping mentors!',
+    description: 'Permite notificar al mentor de tu preferencia que solicitas una mentoria.',
     aliases: ['ping', 'p'],
+    example: "?ping @kutse#0001",
     async execute (client, message, cmd, args, Discord) {
         const u = message.mentions.users.first()
         const mentordoc = await mentorModel.findOne({ 'username': u.tag.toLowerCase()})
-        if(message.channel.id === '810379900418129950' && mentordoc && mentordoc.status == true)  {
+        if(mentordoc && mentordoc.status == true)  {
             const mentorChannel = await message.guild.channels.create(`mentoria-${message.author.tag}`, {
                 type: 'text',
-                parent: '860075080594620416',
+                parent: idCategoriaMentoria,
                 permissionOverwrites: [
                     {
                         allow: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
@@ -74,7 +76,7 @@ module.exports = {
 
             // ME QUEDE AQUI!!!!!!!!!!!!!!!!!!!!
             const mentorCollector = reactionMessage.createReactionCollector((reaction, user) =>
-                reaction.message.guild.member(user).roles.cache.has('810374309150195712') && !user.bot, { dispose: true }
+                reaction.message.guild.member(user).roles.cache.has(idRolMentor) && !user.bot, { dispose: true }
             )
 
             mentorCollector.on('collect', async (reaction) => {
@@ -171,7 +173,7 @@ module.exports = {
             })
 
         } else {
-            message.channel.send("**No se pudo realizar la mentoria.**\n ``` Posibles Razones \n1. El usuario mencionado no es un mentor. \n2. Estas en el canal incorrecto. \n3. El mentor no esta disponible.```")
+            message.channel.send("**No se pudo realizar la mentoria.**\n ``` Posibles Razones \n1. El usuario mencionado no es un mentor. \n2. El mentor no esta disponible.```")
         }
 
     },
