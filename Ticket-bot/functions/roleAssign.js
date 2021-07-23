@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const fetchall = require('discord-fetch-all')
 const fs = require('fs')
 const { MessageAttachment, Message } = require('discord.js');
-const { idRolMentor } = require('..');
+const { idRolMentor } = process.env
 const mongoose = require('mongoose')
 const checkIn = require('../models/checkIn')
 

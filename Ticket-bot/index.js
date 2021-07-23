@@ -5,31 +5,10 @@ const client = new Discord.Client({partial: ['MESSAGE', 'CHANNEL', 'REACTION']})
 const fs = require('fs');
 const { readdirSync } = require('fs');
 
-// CONSTANTES GLOBALES
-idGuild = '864039145588391936'
-
-idCanalSoporte = '867816162150711306'
-idCanalMentoria = '867816372208926730'
-idCanalCheckIn = '867815316540882945'
-
-idCategoriaSoporte = '864044281286754304'
-idCategoriaMentoria = '860075080594620416'
-
-idRolMesa2021 = '864041126566297610'
-idRolSponsor = '707344011618156605'
-idRolStaff = '707343935516704819'
-idRolJuez = '857339869733584916'
-idRolParticipante = '707344268133400696'
-idRolMentor = '864041019385184257'
 
 coleccionCheckIn = 'guilds'
 
 prefix = '?'
-
-module.exports = { prefix , idCanalSoporte, idCanalMentoria, idCanalCheckIn, idCategoriaSoporte,
-    idCategoriaSoporte, idCategoriaMentoria, idRolMesa2021, idRolSponsor, idRolStaff, idRolJuez, idRolParticipante, idRolMentor,
-    coleccionCheckIn, idGuild
-};
 
 fs.readdir('./events', (error, files) => {
     if(error) throw error

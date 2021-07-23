@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const fetchall = require('discord-fetch-all')
 const fs = require('fs')
 const { MessageAttachment, Message } = require('discord.js')
-const { idCategoriaSoporte } = require('../index')
+const { idCategoriaSoporte } = process.env
 
 module.exports = async (guild, user, guildDoc, ticketModel) => {
     guildDoc.ticketCount += 1;

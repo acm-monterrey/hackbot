@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const { dbuser, dbpass } = process.env
 const { connect } = require('mongoose');
-const { idGuild, idCanalSoporte } = require('..');
+const { idGuild, idCanalSoporte } = process.env
 
 
 const url = `mongodb+srv://kutse:${dbpass}@cluster0.zfvd4.mongodb.net/${dbuser}?retryWrites=true&w=majority`

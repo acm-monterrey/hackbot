@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js");
 const { readdirSync } = require("fs");
-const { idRolMentor, idRolStaff, idRolMesa2021 } = require("../..");
+const { idRolMentor, idRolStaff, idRolMesa2021 } = process.env
 
 module.exports = {
   name: "help",

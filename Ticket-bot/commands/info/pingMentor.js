@@ -3,7 +3,7 @@ const fetchall = require('discord-fetch-all')
 const mentorModel = require('../../models/mentor')
 const fs = require('fs')
 const { MessageAttachment } = require('discord.js');
-const { idRolMentor, idCategoriaMentoria } = require("../..");
+const { idRolMentor, idCategoriaMentoria } = process.env
 
 module.exports = {
     name: 'ping',

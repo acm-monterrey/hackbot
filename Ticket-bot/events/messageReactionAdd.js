@@ -4,7 +4,7 @@ const createTicket = require('../functions/createTicket')
 const ticketModel = require('../models/ticket')
 const checkModel = require('../models/checkIn')
 const roleAssign = require('../functions/roleAssign')
-const { idCanalSoporte, idCanalCheckIn } = require('..')
+const { idCanalSoporte, idCanalCheckIn } = process.env
 
 
 module.exports = async(client, reaction, user) => {
