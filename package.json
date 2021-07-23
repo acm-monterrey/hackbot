@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cd Ticket-bot && node .",
-    "postinstall": "cd Ticket-bot && npm install"
+    "start": "node ."
   },
   "author": "ACMMTY",
   "license": "ISC",
