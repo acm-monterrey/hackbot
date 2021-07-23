@@ -1,4 +1,5 @@
-const { token } = require('./config.json')
+require('dotenv').config()
+const { token } = process.env
 const Discord = require('discord.js');
 const client = new Discord.Client({partial: ['MESSAGE', 'CHANNEL', 'REACTION']});
 const fs = require('fs');

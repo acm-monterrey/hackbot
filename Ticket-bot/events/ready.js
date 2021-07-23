@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { dbuser, dbpass } = require('../config.json')
+const { dbuser, dbpass } = process.env
 const { connect } = require('mongoose');
 const { idGuild, idCanalSoporte } = require('..');
 
