@@ -6,10 +6,14 @@ module.exports = {
     description: 'Añadir un mentor a la lista de mentores.',
     aliases: ['am','addm'],
     async execute (client, message, cmd, args, Discord) {
+        const u = message.mentions.users.first()
+        if(!args[0] || !u) return message.reply('Taggea a la persona.')
+        console.log('u :>> ', u);
+
         message.author.send("**REGISTRO MENTORES**\n **Introduce los datos a continuacion para completar el registro.**")
         const questions = [
-            "```Usuario (ej. Kutse#2788)```",
-            "```Habilidades (ej. AWS Python React Javascript)```",
+            "```Nombre```",
+            "```Habilidades, separadas por comas (ej. AWS,Desarrollo web,Python,React,Javascript)```",
             "```Estatus (ej. true o false)```",
             "```Descripcion (ej. Estudiante de ITC)```",
         ]
@@ -52,10 +56,12 @@ module.exports = {
                         .setTimestamp()
                 );
 
-                resHabilidades = res[1].split(' ');
+                resHabilidades = res[1].split(',');
 
                 const addMentorDoc = new mentorModel({
-                    username: res[0],
+                    discordId: u.id,
+                    name: res[0],
+                    username: u.tag,
                     skills: resHabilidades,
                     status: res[2],
                     description: res[3],

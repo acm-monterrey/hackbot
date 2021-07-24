@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose')
 
 const mentor = Schema({
+    discordId: String,
     name: String,
     username: String,
     skills: Array,

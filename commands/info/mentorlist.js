@@ -74,7 +74,7 @@ module.exports = {
 
                     for(let mentor of list[page]) {
                         newM.addField(
-                            `―――――――――――――――――――`, `<${mentor.username}> | ${mentor.name} | ${mentor.skills} | ${mentor.status ? '🟩' : '🟥'}`, false
+                            `―――――――――――――――――――`, `${mentor.username} | ${mentor.name} | ${mentor.skills} | ${mentor.status ? '🟩' : '🟥'}`, false
                         )
                         counter++;
                     }

@@ -26,7 +26,7 @@ module.exports = (client) => {
     })
 
     const checkIn_embed = new Discord.MessageEmbed()
-        //.setThumbnail(client.user.avatarURL())
+        .setThumbnail('https://cdn.discordapp.com/attachments/867815316540882945/868316755691446322/Demo-11.png')
         .setTitle('Bienvenido al Bootcamp!')
         .setDescription('Reacciona a este mensaje con ✅ para confirmar tu check in. \n Reaccionando confirmas que estas de acuerdo con el reglamento de Global Challenge'/* + 'l HackMTY y MLH.'*/)
         /*.addFields(
