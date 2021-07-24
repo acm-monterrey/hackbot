@@ -18,9 +18,9 @@ module.exports = {
             let mentordoc;
             if(u) {
                 mentor = u;
-                mentordoc = await mentorModel.findOne({ 'username': mentor.tag});
+                mentordoc = await mentorModel.findOne({ 'username': mentor.tag.toLowerCase()});
             } else {
-                mentordoc = await mentorModel.findOne({ 'username': firstArg});
+                mentordoc = await mentorModel.findOne({ 'username': firstArg.toLowerCase()});
                 if(!mentordoc) {
                     return message.channel.send("Ese usuario no existe o no es mentor");
                 }
