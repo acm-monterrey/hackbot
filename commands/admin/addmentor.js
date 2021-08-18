@@ -8,7 +8,7 @@ module.exports = {
     async execute (client, message, cmd, args, Discord) {
         const u = message.mentions.users.first()
         if(!args[0] || !u) return message.reply('Taggea a la persona.')
-        console.log('u :>> ', u);
+        console.log(`${message.author} a iniciado un proceso de agregar mentor.`);
 
         message.author.send("**REGISTRO MENTORES**\n **Introduce los datos a continuacion para completar el registro.**")
         const questions = [
@@ -68,6 +68,8 @@ module.exports = {
                 })
 
                 await addMentorDoc.save()
+
+                console.log(`${u.tag} ahora esta registrado como mentor.`);
             }
 
         })

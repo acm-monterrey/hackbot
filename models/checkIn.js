@@ -33,7 +33,7 @@ const checkq = Schema({
     password:String,
     __v:String,
     teamCode:String,
-}, { collection : "checkIn"})
+}, { collection : "users"})
 
 //const checkq = Schema({}, { strict: false})
 

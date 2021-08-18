@@ -51,5 +51,4 @@ module.exports = async(client, reaction, user) => {
             roleAssign(reaction, user, checkModel, client)
         }
     }
-
 }

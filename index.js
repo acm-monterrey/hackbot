@@ -4,7 +4,8 @@ const Discord = require('discord.js');
 const client = new Discord.Client({partial: ['MESSAGE', 'CHANNEL', 'REACTION']});
 const fs = require('fs');
 const { readdirSync } = require('fs');
-
+const disbut = require('discord-buttons');
+disbut(client)
 
 coleccionCheckIn = 'guilds'
 

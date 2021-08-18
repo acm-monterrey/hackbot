@@ -45,6 +45,8 @@ module.exports = async (guild, user, guildDoc, ticketModel) => {
         ]
     })
 
+    console.log(`Bot: Ticket | Estatus: Corecto | ${user.tag} : Ha creado un ticket de soporte.`)
+
     const reactionMessage = await ticketChannel.send(create_ticket)
     reactionMessage.react("🔒");
 

@@ -8,6 +8,7 @@ module.exports = {
     example: "?mentorlist",
     async execute (client, message, cmd, args, Discord) {
         const mentors = await mentorModel.find()
+
         let counter = 1;
         const list = [];
 
@@ -29,7 +30,7 @@ module.exports = {
 
         for(let mentor of list[page]) {
             embed.addField(
-                `―――――――――――――――――――`, `${mentor.username} | ${mentor.name} | ${mentor.skills} | ${mentor.status ? '🟩' : '🟥'}`, false
+                `―――――――――――――――――――`, `<@${mentor.discordId}> | ${mentor.name} | ${mentor.skills} | ${mentor.status ? '🟩' : '🟥'}`, false
             )
             counter++;
         }
@@ -74,7 +75,7 @@ module.exports = {
 
                     for(let mentor of list[page]) {
                         newM.addField(
-                            `―――――――――――――――――――`, `${mentor.username} | ${mentor.name} | ${mentor.skills} | ${mentor.status ? '🟩' : '🟥'}`, false
+                            `―――――――――――――――――――`, `<@${mentor.discordId}> | ${mentor.name} | ${mentor.skills} | ${mentor.status ? '🟩' : '🟥'}`, false
                         )
                         counter++;
                     }
@@ -97,7 +98,7 @@ module.exports = {
 
                     for(let mentor of list[page]) {
                         newM.addField(
-                            `―――――――――――――――――――`, `${mentor.username} | ${mentor.name} | ${mentor.skills} | ${mentor.status ? '🟩' : '🟥'}`, false
+                            `―――――――――――――――――――`, `<@${mentor.discordId}> | ${mentor.name} | ${mentor.skills} | ${mentor.status ? '🟩' : '🟥'}`, false
                         )
                         counter++;
                     }
