@@ -18,9 +18,9 @@ module.exports = {
             let mentordoc;
             if(u) {
                 mentor = u;
-                mentordoc = await mentorModel.findOne({ 'username': mentor.tag.toLowerCase()});
+                mentordoc = await mentorModel.findOne({ 'username': mentor.tag});
             } else {
-                mentordoc = await mentorModel.findOne({ 'username': firstArg.toLowerCase()});
+                mentordoc = await mentorModel.findOne({ 'username': firstArg});
                 if(!mentordoc) {
                     return message.channel.send("Ese usuario no existe o no es mentor");
                 }
@@ -61,7 +61,6 @@ module.exports = {
         }
         catch(err) {
             console.log('err :>> ', err);
-            message.channel.send("Hubo un error, intenta de nuevo más tarde o contacta soporte.")
         }
     },
 

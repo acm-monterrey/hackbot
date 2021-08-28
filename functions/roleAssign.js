@@ -45,6 +45,11 @@ module.exports = async (reaction, user, checkModel, client) => {
                 member.setNickname(nickname)
                 
                 console.log(`Bot: Check-in | Estatus: Correcto | ${user.tag} : Se ha asignado el apodo -> ${nickname}`)
+
+                //await checkUser.findOneAndUpdate({ "profile.discordUsername": { $regex : new RegExp(user.tag, "i")} }, { "status.checkedIn": true});
+                data.status.checkedIn = true;
+                await data.save();
+
                 user.send(correct_assign)
             } else {
                 user.send("```No ha confirmado todo tu equipo. Porfavor, revisa la pagina.```")

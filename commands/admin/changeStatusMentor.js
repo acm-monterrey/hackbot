@@ -2,7 +2,7 @@ const { Client, Message, MessageEmbed } = require("discord.js");
 const mentorModel = require('../../models/mentor')
 
 module.exports = {
-    name: 'changeStatusMentor',
+    name: 'changestatusmentor',
     description: 'Permite cambiar el status de cualquier de los mentores!',
     example: "?changeStatusMentor @kutse#0001",
     aliases: ['csm'],

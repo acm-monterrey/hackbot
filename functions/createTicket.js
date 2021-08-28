@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const fetchall = require('discord-fetch-all')
 const fs = require('fs')
 const { MessageAttachment, Message } = require('discord.js')
-const { idCategoriaSoporte } = process.env
+const { idCategoriaSoporte, idRolStaff } = process.env
 
 module.exports = async (guild, user, guildDoc, ticketModel) => {
     guildDoc.ticketCount += 1;
@@ -41,17 +41,29 @@ module.exports = async (guild, user, guildDoc, ticketModel) => {
             {
                 deny: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
                 id: guild.id
-            }
+            }, 
+            {
+                allow: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
+                id: idRolStaff
+            },
         ]
     })
 
-    console.log(`Bot: Ticket | Estatus: Corecto | ${user.tag} : Ha creado un ticket de soporte.`)
+    console.log(`Bot: Ticket | Estatus: Correcto | ${user.tag} : Ha creado un ticket de soporte.`)
+
+    const tickDoc = new ticketModel({
+        guildID: guild.id,
+        userID: user.id,
+        channelID: ticketChannel.id,
+    })
+
+    await tickDoc.save()
 
     const reactionMessage = await ticketChannel.send(create_ticket)
     reactionMessage.react("🔒");
 
     const ticketCollector = reactionMessage.createReactionCollector((reaction, user) =>
-        reaction.message.guild.members.cache.find((member) => member.id === user.id).hasPermission('ADMINISTRATOR') && !user.bot,
+        (reaction.message.guild.members.cache.find((member) => member.id === user.id).hasPermission('ADMINISTRATOR') || reaction.message.guild.member(user).roles.cache.has(idRolStaff)) && !user.bot,
         { dispose: true }
     )
 
@@ -63,7 +75,7 @@ module.exports = async (guild, user, guildDoc, ticketModel) => {
             reaction.message.channel.delete()
 
             await ticketDoc.deleteOne()
-            user.send('El ticket ha sido borrado.').catch(err => console.log(err))
+            console.log(`Bot: Soporte | Estatus: Correcto | ${user.tag} : Acaba de borrar un ticket exitosamente.`)
         } else if (reaction.emoji.name === '🔒') {
             await reaction.message.channel.updateOverwrite(user.id, { SEND_MESSAGES: false});
             reactionMessage.edit(close_ticket)
@@ -121,13 +133,5 @@ module.exports = async (guild, user, guildDoc, ticketModel) => {
             reaction.message.channel.send(new MessageAttachment('transcript.txt', 'transcript.txt'))
 
         }
-
-        const tickDoc = new ticketModel({
-            guildID: guild.id,
-            userID: user.id,
-            channelID: ticketChannel.id,
-        })
-
-        await tickDoc.save()
     })
 }

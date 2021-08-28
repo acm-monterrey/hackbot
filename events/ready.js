@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const { dbuser, dbpass } = process.env
 const { connect } = require('mongoose');
-const { idGuild, idCanalSoporte, idCanalCheckIn } = process.env
+const { idGuild, idCanalSoporte, idCanalCheckIn, idCanalReglamento } = process.env
 
 
 const url = `mongodb+srv://hisao:${dbpass}@cluster0.dzzzi.mongodb.net/${dbuser}?retryWrites=true&w=majority`
@@ -32,7 +32,7 @@ module.exports = (client) => {
         .addFields(
             { name: 'Codigo de Conducta HackMTY', value: 'https://drive.google.com/file/d/1YL9Ggk-TkUVuyHKCzhH8O2h1pacDg3Q-/view'},
             { name: 'Codigo de Conducta MLH', value: 'https://static.mlh.io/docs/mlh-code-of-conduct.pdf'},
-            { name: 'Reglamento del HackMTY', value: '#reglamento'},
+            { name: 'Reglamento del HackMTY', value: `<#${idCanalReglamento}>`},
         )
         .setFooter('HackMTY 2021')
         .setColor('#673290')

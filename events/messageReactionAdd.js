@@ -29,7 +29,7 @@ module.exports = async(client, reaction, user) => {
     if(reaction.message.channel.id === idCanalSoporte) { // ID del canal ticket en el que se reaccionara.
         
         if(reaction.emoji.name === '🎫') {
-            const ticketDoc = await ticketModel.findOne({ guildID: guild.id, userID: user.id })
+            const ticketDoc = await ticketModel.findOne({ guildID: guild.id, userID: user.id})
 
             if(ticketDoc) {
                 const channel = guild.channels.cache.get(ticketDoc.channelID)

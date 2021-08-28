@@ -7,6 +7,9 @@ const mentor = Schema({
     skills: Array,
     status: Boolean,
     description: String,
-}, { collection : 'mentors'})
+}, {   
+    collection: 'mentors',
+    timestamps: true
+})
 
 module.exports = model('mentor', mentor)

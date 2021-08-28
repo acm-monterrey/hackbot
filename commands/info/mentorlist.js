@@ -7,7 +7,7 @@ module.exports = {
     aliases: ['ml'],
     example: "?mentorlist",
     async execute (client, message, cmd, args, Discord) {
-        const mentors = await mentorModel.find()
+        const mentors = await mentorModel.find({'status': true}).sort("-updatedAt")
 
         let counter = 1;
         const list = [];
@@ -43,7 +43,7 @@ module.exports = {
             let r;
             const filter = (r, u) => symbols.includes(r.emoji.name) && u.id === message.author.id;
             try {
-                r = await msg.awaitReactions(filter, { max: 1, time: 20000, errors: ["time"]})
+                r = await msg.awaitReactions(filter, { max: 1, time: 30000, errors: ["time"]})
 
             } catch {
                 let newM = new Discord.MessageEmbed()
